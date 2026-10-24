@@ -13,11 +13,11 @@ jobs:
     # macos-14 runners are Apple silicon, which is what Pulso is built for.
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: pnpm
@@ -37,7 +37,7 @@ jobs:
 
       - run: pnpm dist
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: release.noindex/*.dmg
           generate_release_notes: true
