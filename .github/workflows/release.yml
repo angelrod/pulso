@@ -1,0 +1,43 @@
+# Builds Pulso and publishes a GitHub release when a version tag (v1.2.3) is pushed.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # macos-14 runners are Apple silicon, which is what Pulso is built for.
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check the tag matches package.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version=$(node -p "require('./package.json').version")
+          if [ "$tag" != "$version" ]; then
+            echo "Tag v$tag does not match package.json version $version" >&2
+            exit 1
+          fi
+
+      - run: pnpm verify
+
+      - run: pnpm dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release.noindex/*.dmg
+          generate_release_notes: true
