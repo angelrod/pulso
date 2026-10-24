@@ -1,8 +1,30 @@
-# Pulso
+<p align="center">
+  <img src="assets/logo.png" alt="Pulso" width="128" height="128">
+</p>
 
-See what your Mac is spending, and quit it, from the menu bar.
+<h1 align="center">Pulso</h1>
 
-<img src="assets/screenshot.png" alt="The Pulso panel" width="368">
+<p align="center">
+  <strong>See what your Mac is spending, and quit it, from the menu bar.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/angelrod/pulso/releases/latest"><img src="https://img.shields.io/github/v/release/angelrod/pulso?label=release&color=1fb58a" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/macOS-Apple%20Silicon-1fb58a?logo=apple&logoColor=white" alt="macOS, Apple Silicon">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/angelrod/pulso?color=1fb58a" alt="MIT license"></a>
+  <a href="https://github.com/angelrod/pulso/actions/workflows/ci.yml"><img src="https://github.com/angelrod/pulso/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/angelrod/pulso/releases/latest"><img src="https://img.shields.io/badge/Download%20for%20Mac-0e7f69?style=for-the-badge&logo=apple&logoColor=white" alt="Download for Mac"></a>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="assets/screenshot-light.png">
+    <img src="assets/screenshot.png" alt="The Pulso panel" width="368">
+  </picture>
+</p>
 
 Pulso lives in the menu bar as a small icon and a number: the memory in use. Click it
 for a panel with memory, memory pressure, swap and CPU, the apps using the most memory,

@@ -53,7 +53,7 @@ const css = readFileSync(join(root, "src/renderer/panel.css"), "utf8");
 const material = light
   ? "linear-gradient(180deg,rgba(246,246,246,.97),rgba(236,236,236,.97))"
   : "linear-gradient(180deg,rgba(58,58,62,.97),rgba(44,44,48,.97))";
-const backdrop = `html{background:${light ? "#d9d9de" : "#1c1c1e"}}
+const backdrop = `html{background:transparent}
 #frame{display:inline-block;margin:14px;width:340px;border-radius:12px;overflow:hidden;
 background:${material}}`;
 const page = join(out, "panel.html");
