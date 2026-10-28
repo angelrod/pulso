@@ -1,6 +1,6 @@
 {
   "name": "pulso",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "See what your Mac is spending, and quit it, from the menu bar.",
   "author": "Miguel Angel Rod",

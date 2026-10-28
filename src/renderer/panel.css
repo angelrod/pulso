@@ -36,6 +36,8 @@ body {
   background: transparent;
   padding: 6px 0;
   overflow: hidden;
+  cursor: default;
+  user-select: none;
 }
 /* The tone drives every pressure colour: green when normal, orange when warning, red when critical. */
 .tone-normal .bar > i, .tone-normal .dot { background: var(--green); }
@@ -90,8 +92,10 @@ body {
 /* The hover highlight is a CSS :hover, not a fixed class: the blue row and the revealed Quit button. */
 .proc:hover { background: var(--blue); margin: 0 6px; padding: 5px 8px; border-radius: 6px; }
 .proc:hover .cpu { color: rgba(255,255,255,0.8); }
+/* Sizing to the row's line box keeps the pill from growing the row on hover. */
 .quit-btn {
-  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px;
+  font-size: 11px; font-weight: 600; line-height: 15px; padding: 0 8px;
+  border-radius: 5px;
   background: rgba(255,255,255,0.22); color: #fff;
 }
 .empty { padding: 5px 14px; color: var(--dim); font-size: 12px; }

@@ -64,8 +64,13 @@ const png = join(out, light ? "panel-light.png" : "panel.png");
 const electron = join(root, "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
-execFileSync(electron, [join(root, "scripts/shot-panel.cjs"), light ? "light" : "dark", page, png], {
+const shot = execFileSync(electron, [join(root, "scripts/shot-panel.cjs"), light ? "light" : "dark", page, png], {
   env,
-  stdio: "ignore",
+  encoding: "utf8",
+  stdio: ["ignore", "pipe", "ignore"],
 });
 console.log(`Preview written to ${png} (first process row hovered). Open it with Read.`);
+// Row heights before and after the hover, panel height, and the pointer and text
+// selection of what users touch: numbers, for what the eye cannot judge.
+const metrics = shot.split("\n").find((line) => line.startsWith("PANEL_METRICS "));
+if (metrics) console.log(metrics);
