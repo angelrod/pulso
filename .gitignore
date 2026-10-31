@@ -1,6 +1,5 @@
-node_modules/
-out/
-dist/
-release.noindex/
+.build/
+.swiftpm/
+release-out/
 .DS_Store
 *.log

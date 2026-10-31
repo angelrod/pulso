@@ -1,11 +1,13 @@
 // Flags comment blocks over one line, or lines over MAX_WIDTH, in non-test sources.
-// Keeps comments to a short why; part of `pnpm verify`.
+// Usage: check-comments.mjs [dir] [extension]   (defaults: src, ts)
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const dir = join(import.meta.dirname, "..", "src");
+const base = process.argv[2] ?? "src";
+const ext = `.${process.argv[3] ?? "ts"}`;
+const dir = join(import.meta.dirname, "..", base);
 const files = readdirSync(dir, { recursive: true }).filter(
-  (f) => f.endsWith(".ts") && !f.endsWith(".test.ts") && !f.endsWith(".d.ts"),
+  (f) => f.endsWith(ext) && !f.endsWith(`.test${ext}`) && !f.endsWith(".d.ts"),
 );
 const isComment = (l) => /^\s*(\/\/|\/\*|\*)/.test(l);
 // One line is only short if it is also narrow.
@@ -21,13 +23,13 @@ for (const file of files) {
     for (let j = i; j <= end; j += 1) {
       if (lines[j].length > MAX_WIDTH) {
         problems += 1;
-        console.log(`src/${file}:${j + 1}  comment line is ${lines[j].length} chars, max is ${MAX_WIDTH}:`);
+        console.log(`${base}/${file}:${j + 1}  comment line is ${lines[j].length} chars, max is ${MAX_WIDTH}:`);
         console.log(`    ${lines[j].trim()}`);
       }
     }
     if (end > i) {
       problems += 1;
-      console.log(`src/${file}:${i + 1}  ${end - i + 1}-line comment, max is 1:`);
+      console.log(`${base}/${file}:${i + 1}  ${end - i + 1}-line comment, max is 1:`);
       for (let j = i; j <= end; j += 1) console.log(`    ${lines[j].trim()}`);
     }
     i = end;

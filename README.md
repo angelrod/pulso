@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/angelrod/pulso/releases/latest"><img src="https://img.shields.io/github/v/release/angelrod/pulso?label=release&color=1fb58a" alt="Latest release"></a>
-  <img src="https://img.shields.io/badge/macOS-Apple%20Silicon-1fb58a?logo=apple&logoColor=white" alt="macOS, Apple Silicon">
+  <img src="https://img.shields.io/badge/macOS%2013+-Apple%20Silicon-1fb58a?logo=apple&logoColor=white" alt="macOS 13 or later, Apple Silicon">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/angelrod/pulso?color=1fb58a" alt="MIT license"></a>
   <a href="https://github.com/angelrod/pulso/actions/workflows/ci.yml"><img src="https://github.com/angelrod/pulso/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
@@ -22,7 +22,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="assets/screenshot-light.png">
-    <img src="assets/screenshot.png" alt="The Pulso panel" width="368">
+    <img src="assets/screenshot.png" alt="The Pulso panel" width="352">
   </picture>
 </p>
 
@@ -30,28 +30,39 @@ Pulso lives in the menu bar as a small icon and a number: the memory in use. Cli
 for a panel with memory, memory pressure, swap and CPU, the apps using the most memory,
 and a Quit button on each one. No window, no Dock icon.
 
+Pulso 2 is a native Swift app. It uses about 18 MB of memory, where the 0.1 versions used
+about 250 MB.
+
 ## Features
 
 - **Memory used**, measured the way Activity Monitor measures it (app + wired +
   compressed), not `total - free`, which reads close to 100% on any Mac.
 - **Memory pressure** colours the icon: plain when normal, orange on warning, red on
   critical. A Mac at 85% memory is often fine; pressure says whether it is struggling.
-- **Swap** and **CPU** at a glance.
+- **Swap** and **CPU** at a glance. App CPU is a share of the whole Mac, on the same scale
+  as the CPU reading.
 - **One row per app.** Every helper process counts towards its app, so Chrome shows up
   as the gigabytes it really uses, not as its largest single process.
+- **Copies started by another app** get their own row, named after what started them
+  (`Chrome by Raycast`), so you can tell them from your own.
+- **Click a row** to bring that app to the front. A tool running inside an app (`node`
+  in a terminal) brings that app.
 - **Quit an app the way ⌘Q does**, after a confirmation. The app can still ask about
-  unsaved work.
+  unsaved work. No permission is needed.
 - **Plain-language help.** Hover the ⓘ next to each reading, or open
   "What do these mean?".
+- **Open at Login**, on by default, with a switch in the panel.
+- **Updates itself**, through [Sparkle](https://sparkle-project.org).
 - Light and dark mode. Live updates every 3 seconds.
 
 ## Install
 
-Requires a Mac with Apple Silicon (M1 or later).
+Requires a Mac with Apple Silicon (M1 or later) and macOS 13 or later.
 
-1. Download `Pulso-<version>-arm64.dmg` from the
+1. Download `Pulso-<version>.dmg` from the
    [latest release](https://github.com/angelrod/pulso/releases/latest).
-2. Open it and drag **Pulso** to **Applications**.
+2. Open it and drag **Pulso** to **Applications**. If you have Pulso 0.1, quit it first
+   and choose **Replace**.
 3. Open Pulso. The first time, macOS blocks it, because the app is not yet signed with
    an Apple Developer ID. To allow it, open **System Settings → Privacy & Security**,
    scroll down, and click **Open Anyway** next to the message about Pulso. You only
@@ -63,58 +74,51 @@ Requires a Mac with Apple Silicon (M1 or later).
    xattr -dr com.apple.quarantine /Applications/Pulso.app
    ```
 
-The first time you quit an app from Pulso, macOS asks whether Pulso may control it.
-That permission is what lets Pulso quit apps the way ⌘Q does. You can change it later
-in **System Settings → Privacy & Security → Automation**.
+**Open at Login.** Pulso turns this on the first time it runs from Applications. Until it
+is signed with a Developer ID, it shows in **System Settings → General → Login Items →
+Allow in the Background** as "Pulso — Item from unidentified developer". Turn it off
+there, or with **Open at Login** in the panel; Pulso will not turn it back on by itself.
+
+## Updates
+
+Pulso checks for a new version once a day, and on demand with **Check for Updates…** in
+the panel. When there is one, it shows what changed and installs it on your word: it
+downloads, replaces itself and reopens. No dmg, no dragging.
+
+Every update is signed with the project's private EdDSA key, and Pulso checks it against
+the public key it carries. An update that does not match is refused. The check asks
+GitHub for `appcast.xml` from the latest release of this repository and sends nothing
+about your Mac beyond what any web request carries.
 
 ## How it measures
 
 | Reading | Source |
 |---|---|
-| Memory used | `vm_stat`: (anonymous − purgeable) + wired + occupied by compressor |
+| Memory used | `host_statistics64`: (internal − purgeable) + wired + compressor pages |
 | Memory pressure | `sysctl kern.memorystatus_vm_pressure_level` |
 | Swap | `sysctl vm.swapusage` |
-| CPU | the change in each core's tick counters between readings (`os.cpus()`) |
-| Apps | `ps`, grouped by the outermost `.app` bundle each process lives in |
+| CPU | the change in each core's ticks between readings (`host_processor_info`) |
+| Apps | `proc_listallpids` and `proc_pid_rusage` (the footprint Activity Monitor shows), grouped by the outermost `.app` bundle and by the app responsible for each process |
 
-Pulso reads these locally and sends none of them anywhere. Its only network request is
-the update check below.
-
-## Updates
-
-Once a day, Pulso asks GitHub for the latest release of this repository
-(`api.github.com/repos/angelrod/pulso/releases/latest`). If there is a newer version,
-the panel shows it with a **Download** button that opens the release page. Download the
-new `.dmg` and drag Pulso to Applications again to replace the old one.
-
-The request sends nothing about your Mac beyond what any web request carries (your IP
-address, and Pulso's version in the `User-Agent`). Automatic, in-place updates need the
-app to be signed with an Apple Developer ID, which is planned.
+Pulso reads these locally and sends none of them anywhere. It can read the memory of
+your own processes only, which are also the only ones you can quit, so the list is
+titled "Your apps using most memory".
 
 ## Build from source
 
-You need Node.js 20 and pnpm.
+You need Xcode 16 (Swift 6).
 
 ```sh
-pnpm install
-pnpm dev          # run Pulso in the menu bar
-pnpm verify       # tests, typecheck, comment check and build
+sh native/verify.sh               # build, tests and comment check
+sh native/scripts/bundle.sh       # builds native/.build/app/Pulso.app
 ```
 
-The code is split so that most of it can be tested without Electron:
-
-| File | Job |
+| Folder | Job |
 |---|---|
-| `src/main/metrics.ts` | pure parsing and formatting of `ps`, `vm_stat` and `sysctl` output |
-| `src/main/collect.ts` | runs those commands and builds a snapshot |
-| `src/main/panel.ts` | turns a snapshot into the panel's view model |
-| `src/main/tray.ts` | the menu bar title, icon and tooltip |
-| `src/main/quit.ts` | asks an app to quit through Apple Events |
-| `src/shared/bridge.ts` | the typed bridge between the panel and the main process |
-| `src/renderer/` | the panel's markup and CSS |
-| `src/main/index.ts` | the only file that touches Electron at runtime |
-
-`pnpm preview:panel` renders the panel to a PNG, to check CSS changes by eye.
+| `native/Sources/PulsoCore` | everything that can be tested without a window: readings, grouping, the panel's view model, the rules for Quit and Open at Login |
+| `native/Sources/PulsoUI` | the panel, in SwiftUI |
+| `native/Sources/Pulso` | the app: menu bar item, panel window, actions, Sparkle |
+| `native/Tests` | the tests |
 
 ## License
 

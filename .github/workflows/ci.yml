@@ -8,13 +8,8 @@ on:
 
 jobs:
   verify:
-    runs-on: macos-14
+    # macos-15 runners are Apple silicon with Xcode 16 (Swift 6), which Pulso needs.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm verify
+      - run: sh native/verify.sh
